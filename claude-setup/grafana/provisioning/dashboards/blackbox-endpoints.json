@@ -1,0 +1,60 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Blackbox Exporter - Website Monitoring",
+    "uid": "blackbox-endpoints",
+    "timezone": "browser",
+    "schemaVersion": 36,
+    "version": 1,
+    "panels": [
+      {
+        "type": "graph",
+        "title": "HTTP Status Codes",
+        "targets": [
+          {
+            "expr": "probe_http_status_code{instance=\"https://portfolio.aftabs.me\"}",
+            "legendFormat": "Portfolio Website",
+            "refId": "A"
+          },
+          {
+            "expr": "probe_http_status_code{instance=\"https://thebagelproject.dev\"}",
+            "legendFormat": "Bagel Project",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Response Time (ms)",
+        "targets": [
+          {
+            "expr": "probe_duration_seconds{instance=\"https://portfolio.aftabs.me\"} * 1000",
+            "legendFormat": "Portfolio Website",
+            "refId": "C"
+          },
+          {
+            "expr": "probe_duration_seconds{instance=\"https://thebagelproject.dev\"} * 1000",
+            "legendFormat": "Bagel Project",
+            "refId": "D"
+          }
+        ]
+      },
+      {
+        "type": "singlestat",
+        "title": "Availability",
+        "targets": [
+          {
+            "expr": "probe_success{instance=\"https://portfolio.aftabs.me\"}",
+            "legendFormat": "Portfolio Website",
+            "refId": "E"
+          },
+          {
+            "expr": "probe_success{instance=\"https://thebagelproject.dev\"}",
+            "legendFormat": "Bagel Project",
+            "refId": "F"
+          }
+        ]
+      }
+    ]
+  }
+}
