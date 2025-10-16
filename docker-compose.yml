@@ -1,0 +1,136 @@
+services:
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: grafana-demo-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - grafana-network
+
+  # Blackbox Exporter for probing endpoints
+  blackbox-exporter:
+    image: prom/blackbox-exporter:latest
+    container_name: grafana-demo-blackbox
+    ports:
+      - "9115:9115"
+    volumes:
+      - ./config/blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml
+    command:
+      - '--config.file=/etc/blackbox_exporter/config.yml'
+    networks:
+      - grafana-network
+
+  # Loki for log aggregation
+  loki:
+    image: grafana/loki:latest
+    container_name: grafana-demo-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./config/loki/loki-config.yml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - grafana-network
+
+  # Promtail for log collection
+  promtail:
+    image: grafana/promtail:latest
+    container_name: grafana-demo-promtail
+    volumes:
+      - ./config/promtail/promtail-config.yml:/etc/promtail/config.yml
+      - /var/log:/var/log
+      - ./logs:/logs
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - grafana-network
+    depends_on:
+      - loki
+
+  # Grafana OSS
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-demo-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_INSTALL_PLUGINS=
+    volumes:
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+    networks:
+      - grafana-network
+    depends_on:
+      - prometheus
+      - loki
+
+  # MCP Server for Grafana
+  # Official image from https://hub.docker.com/r/mcp/grafana
+  # Transport: sse (Server-Sent Events) for HTTP/web API access
+  # Auth: Supports both service account token (recommended) or username/password (demo)
+  mcp-server:
+    image: mcp/grafana:latest
+    container_name: grafana-demo-mcp
+    ports:
+      - "3001:3001"
+    environment:
+      - GRAFANA_URL=http://grafana:3000
+      # Option 1: Service Account Token (recommended for production)
+      - GRAFANA_SERVICE_ACCOUNT_TOKEN=${GRAFANA_SERVICE_ACCOUNT_TOKEN:-}
+      # Option 2: Username/Password (used for demo when token not set)
+      - GRAFANA_USERNAME=${GRAFANA_USERNAME:-admin}
+      - GRAFANA_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    # Transport options: stdio (CLI/desktop), sse (HTTP/web), streamable-http (streaming)
+    # Using sse for web-based conversational UI
+    command: ["-transport", "sse", "-address", "0.0.0.0:3001"]
+    networks:
+      - grafana-network
+    depends_on:
+      - grafana
+    restart: unless-stopped
+
+  # Custom UI for MCP interaction
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: grafana-demo-ui
+    ports:
+      - "8888:80"
+    networks:
+      - grafana-network
+    depends_on:
+      - mcp-server
+
+  # Demo application that generates metrics and logs
+  demo-app:
+    build:
+      context: ./demo-app
+      dockerfile: Dockerfile
+    container_name: grafana-demo-app
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - grafana-network
+
+networks:
+  grafana-network:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  loki-data:
+  grafana-data:

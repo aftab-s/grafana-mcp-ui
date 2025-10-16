@@ -1,0 +1,31 @@
+# Docker volumes
+prometheus-data/
+loki-data/
+grafana-data/
+
+# Logs
+logs/
+*.log
+
+# Environment
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node modules (if developing locally)
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/

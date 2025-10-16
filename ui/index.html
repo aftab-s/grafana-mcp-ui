@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafana MCP Chat - AI Assistant for Metrics & Logs</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    <h1 class="app-title">Grafana MCP Assistant</h1>
+                </div>
+                <div class="status-section">
+                    <div class="status-indicator" id="mcpStatus">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Connecting...</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Quick Actions</h3>
+                    <div class="quick-actions">
+                        <button class="action-button" data-prompt="Show me all available dashboards">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                            List Dashboards
+                        </button>
+                        <button class="action-button" data-prompt="What are the current error rates from the demo application?">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Check Metrics
+                        </button>
+                        <button class="action-button" data-prompt="Show me recent error logs from the demo application">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            View Logs
+                        </button>
+                        <button class="action-button" data-prompt="What datasources are configured in Grafana?">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                            </svg>
+                            List Datasources
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Example Queries</h3>
+                    <div class="example-queries">
+                        <div class="example-query">
+                            "What's the p95 latency for the demo app?"
+                        </div>
+                        <div class="example-query">
+                            "Show me all panels in the metrics dashboard"
+                        </div>
+                        <div class="example-query">
+                            "Are there any failing health checks?"
+                        </div>
+                        <div class="example-query">
+                            "Query Prometheus for request rates"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Links</h3>
+                    <div class="external-links">
+                        <a href="http://localhost:3000" target="_blank" class="external-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Open Grafana
+                        </a>
+                        <a href="http://localhost:9090" target="_blank" class="external-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Open Prometheus
+                        </a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Chat Area -->
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <div class="welcome-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h2>Welcome to Grafana MCP Assistant</h2>
+                        <p>I can help you explore your Grafana dashboards, query metrics from Prometheus, analyze logs from Loki, and more!</p>
+                        <p class="welcome-subtext">Try asking me about your dashboards, metrics, or use the quick actions in the sidebar.</p>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <form class="chat-input-form" id="chatForm">
+                        <textarea 
+                            class="chat-input" 
+                            id="chatInput" 
+                            placeholder="Ask me about your Grafana dashboards, metrics, logs..." 
+                            rows="1"
+                        ></textarea>
+                        <button type="submit" class="send-button" id="sendButton">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

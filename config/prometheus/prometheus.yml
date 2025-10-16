@@ -1,0 +1,70 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'grafana-mcp-demo'
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # Blackbox exporter for HTTP probing
+  - job_name: 'blackbox'
+    static_configs:
+      - targets: ['blackbox-exporter:9115']
+        labels:
+          service: 'blackbox-exporter'
+
+  # Grafana monitoring
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+        labels:
+          service: 'grafana'
+
+  # Demo application metrics
+  - job_name: 'demo-app'
+    static_configs:
+      - targets: ['demo-app:8080']
+        labels:
+          service: 'demo-app'
+
+  # HTTP probes using blackbox exporter
+  - job_name: 'blackbox-http'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - http://grafana:3000
+          - http://demo-app:8080
+          - http://ui:80
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # ICMP probes
+  - job_name: 'blackbox-icmp'
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    static_configs:
+      - targets:
+          - grafana
+          - prometheus
+          - loki
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
